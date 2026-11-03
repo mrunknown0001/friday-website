@@ -5,8 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Friday: a local-first AI coding and DevOps assistant</title>
 <meta name="description" content="Friday works on your projects and servers from your own machine. Every change is shown to you and runs only after you approve it.">
+<meta property="og:title" content="Friday: a local-first AI coding and DevOps assistant">
+<meta property="og:description" content="A Linux desktop app or local web app. Models from the provider you already have a key for. Every edit, command and deploy is shown and approved first.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0d12'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='system-ui' font-size='16' font-weight='700' fill='%235eead4'%3EF%3C/text%3E%3C/svg%3E">
 <style>
-:root{--bg:#0b0d12;--panel:#12151d;--line:#232836;--text:#e6e8ee;--muted:#9aa3b5;--accent:#7c9cff;--accent2:#5eead4;--radius:14px}
+:root{
+  --bg:#0b0d12;--panel:#12151d;--panel2:#171b26;--line:#232836;--text:#e6e8ee;--muted:#9aa3b5;
+  --accent:#7c9cff;--accent2:#5eead4;--warn:#f5c16c;--radius:14px
+}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -14,169 +21,310 @@ a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
 .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
 header{position:sticky;top:0;z-index:10;background:rgba(11,13,18,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-nav{display:flex;align-items:center;justify-content:space-between;height:60px}
-.logo{font-weight:700;font-size:20px;color:var(--text);letter-spacing:.3px}
+nav{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{font-weight:700;font-size:20px;color:var(--text);letter-spacing:.3px;white-space:nowrap}
 .logo span{color:var(--accent2)}
-nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0}
-nav ul a{color:var(--muted);font-size:15px}
+nav ul{display:flex;gap:20px;list-style:none;margin:0;padding:0}
+nav ul a{color:var(--muted);font-size:14px}
 nav ul a:hover{color:var(--text);text-decoration:none}
-.hero{padding:96px 0 72px;text-align:center}
-.badge{display:inline-block;padding:4px 12px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:13px;margin-bottom:22px}
-h1{font-size:clamp(34px,6vw,58px);line-height:1.1;margin:0 0 20px}
-h1 em{font-style:normal;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.lead{max-width:720px;margin:0 auto 34px;color:var(--muted);font-size:19px}
-.btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.btn{padding:12px 22px;border-radius:10px;font-weight:600;border:1px solid var(--line);color:var(--text)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#0b0d12}
-.btn:hover{text-decoration:none;filter:brightness(1.1)}
-section{padding:72px 0;border-top:1px solid var(--line)}
-h2{font-size:32px;margin:0 0 10px}
-.sub{color:var(--muted);margin:0 0 36px;max-width:700px}
-.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
-.card h3{margin:0 0 8px;font-size:18px}
-.card p{margin:0;color:var(--muted);font-size:15px}
-.icon{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;margin-bottom:14px;color:var(--accent);background:rgba(124,156,255,.12);border:1px solid rgba(124,156,255,.25)}
-.card:nth-child(even) .icon{color:var(--accent2);background:rgba(94,234,212,.10);border-color:rgba(94,234,212,.25)}
-.icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.two{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
-.steps{counter-reset:s;list-style:none;padding:0;margin:0}
-.steps li{counter-increment:s;position:relative;padding-left:40px;margin-bottom:16px;color:var(--muted)}
-.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--line);color:var(--text);font-size:13px;display:grid;place-items:center}
-.steps strong{color:var(--text)}
-pre{position:relative;background:#080a0e;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0 18px;overflow-x:auto;font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#cfd6e6}
-.copy{position:absolute;top:8px;right:8px;background:var(--panel);color:var(--muted);border:1px solid var(--line);border-radius:6px;font-size:12px;padding:3px 8px;cursor:pointer}
-.copy:hover{color:var(--text)}
-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em;background:var(--panel);padding:1px 6px;border-radius:5px}
-table{width:100%;border-collapse:collapse;font-size:15px}
-th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-th{color:var(--muted);font-weight:600}
-.tablewrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}
-.note{color:var(--muted);font-size:14px}
-footer{border-top:1px solid var(--line);padding:32px 0;color:var(--muted);font-size:14px;text-align:center}
-@media (max-width:720px){nav ul{display:none}.hero{padding:64px 0 48px}}
+.nav-cta{border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+.hero{padding:88px 0 64px}
+.kicker{display:inline-flex;align-items:center;gap:8px;color:var(--accent2);font-size:13px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;margin:0 0 16px}
+.kicker i{width:7px;height:7px;border-radius:50%;background:var(--accent2);display:inline-block}
+h1{font-size:clamp(34px,5vw,56px);line-height:1.08;letter-spacing:-.03em;margin:0 0 18px;max-width:16ch}
+.lede{font-size:19px;color:var(--muted);max-width:68ch;margin:0 0 28px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:11px 16px;font-weight:650;border:1px solid transparent}
+.btn-primary{background:var(--accent);color:#0b0d12}
+.btn-primary:hover{text-decoration:none;filter:brightness(1.08)}
+.btn-ghost{border-color:var(--line);color:var(--text);background:transparent}
+.btn-ghost:hover{text-decoration:none;border-color:var(--muted)}
+.fine{color:var(--muted);font-size:14px;margin:0}
+.providers{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.providers span{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:4px 10px;font-size:13px}
+section{padding:28px 0 8px}
+h2{font-size:28px;letter-spacing:-.02em;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 22px;max-width:70ch}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 16px}
+.card h3{margin:0 0 6px;font-size:16px}
+.card p{margin:0;color:var(--muted);font-size:14.5px}
+.wide{grid-column:span 2}
+.split{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:start}
+.panel{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:18px}
+.panel h3{margin:0 0 12px;font-size:15px;color:var(--muted);font-weight:600}
+.row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
+.row:first-of-type{border-top:0}
+.row b{font-weight:600}
+.ok{color:var(--accent2)}
+.wait{color:var(--warn)}
+.modes{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.mode{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.mode strong{display:block;margin-bottom:4px}
+.mode span{color:var(--muted);font-size:13.5px}
+table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:13px;background:#10131a}
+tr:last-child td{border-bottom:0}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em;color:#d7def2}
+.steps{counter-reset:step;display:grid;gap:10px}
+.steps li{list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 14px 14px 58px;position:relative}
+.steps{padding:0;margin:0}
+.steps li::before{counter-increment:step;content:counter(step);position:absolute;left:14px;top:14px;width:28px;height:28px;border-radius:8px;background:#1b2233;color:var(--accent2);display:grid;place-items:center;font-weight:700;font-size:13px}
+footer{border-top:1px solid var(--line);margin-top:56px;padding:28px 0 40px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{color:var(--muted)}
+@media(max-width:860px){
+  .grid,.modes,.split{grid-template-columns:1fr}
+  .wide{grid-column:auto}
+  nav ul{display:none}
+  h1{max-width:none}
+}
 </style>
 </head>
 <body>
-<header><div class="wrap"><nav>
-<a class="logo" href="#">Fri<span>day</span></a>
-<ul><li><a href="#features">Features</a></li><li><a href="#approvals">Approvals</a></li><li><a href="#devops">DevOps</a></li><li><a href="#install">Install</a></li><li><a href="#security">Security</a></li><li><a href="https://github.com/mrunknown0001/friday" target="_blank" rel="noopener noreferrer">GitHub</a></li></ul>
-</nav></div></header>
+<header>
+  <div class="wrap">
+    <nav>
+      <a class="logo" href="#top">Fri<span>day</span></a>
+      <ul>
+        <li><a href="#what">What it does</a></li>
+        <li><a href="#approvals">Approvals</a></li>
+        <li><a href="#devops">DevOps</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a class="nav-cta" href="https://github.com/mrunknown0001/friday">GitHub</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
 
-<main>
-<div class="wrap hero">
-<div class="badge">Phase 7: desktop app and hardening</div>
-<h1>A <em>local-first</em> AI assistant<br>for code and servers</h1>
-<p class="lead">Friday reads, edits, tests and commits in the projects you authorize, and diagnoses servers over SSH. You approve every change before it runs. It runs as a Linux desktop app or a local web app, with <a href="https://notokenlimit.com">NoTokenLimit</a> as its model provider.</p>
-<div class="btns"><a class="btn primary" href="#install">Get started</a><a class="btn" href="#features">See what it does</a><a class="btn" href="https://github.com/mrunknown0001/friday" target="_blank" rel="noopener noreferrer">View on GitHub</a></div>
-</div>
+<main id="top">
+  <div class="wrap">
+    <div class="hero">
+      <p class="kicker"><i></i> Phase 7 · desktop app and hardening</p>
+      <h1>A local-first assistant that asks before it acts.</h1>
+      <p class="lede">Friday is an AI coding and DevOps assistant that runs on your machine, as a Linux desktop app or a local web app. It reads, edits, tests and commits in projects you authorize, and it can diagnose servers, plan deploys and run approved SSH commands. Every change is shown to you first.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="https://github.com/mrunknown0001/friday">View on GitHub</a>
+        <a class="btn btn-ghost" href="https://github.com/mrunknown0001/friday/blob/main/README.md">Read the docs</a>
+        <a class="btn btn-ghost" href="https://github.com/mrunknown0001/friday/blob/main/docs/ROADMAP.md">Roadmap</a>
+      </div>
+      <p class="fine">Bring a key you already have. Friday stores conversations and memories locally. API keys stay in your config file and are never written to the database.</p>
+      <div class="providers" aria-label="Supported model providers">
+        <span>NoTokenLimit</span>
+        <span>Anthropic</span>
+        <span>OpenAI</span>
+        <span>OpenRouter</span>
+        <span>Google Gemini</span>
+        <span>7API</span>
+      </div>
+    </div>
 
-<section id="features"><div class="wrap">
-<h2>What Friday does</h2>
-<p class="sub">Reading is automatic. Anything that changes files, runs commands or touches a server waits for your approval.</p>
-<div class="grid">
-<div class="card"><div class="icon" aria-hidden="true"><svg viewBox='0 0 24 24'><path d='M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z'/><path d='M14 3v6h6'/><path d='M9 12h6M12 9v6M9 18h6'/></svg></div><h3>Edits you review</h3><p>Every edit is shown as a diff. Each change can be undone, and a whole run can be rolled back, but never over edits you made since.</p></div>
-<div class="card"><div class="icon" aria-hidden="true"><svg viewBox='0 0 24 24'><path d='M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.2 21.5h11.6a2 2 0 0 0 1.7-3L14 9V3'/><path d='M7 15h10'/></svg></div><h3>Test insights</h3><p>Runs Vitest, Jest, node --test, pytest, Go and Playwright suites. It runs the tests related to your changes first, and it detects flaky and slow tests.</p></div>
-<div class="card"><div class="icon" aria-hidden="true"><svg viewBox='0 0 24 24'><circle cx='6' cy='6' r='2.5'/><circle cx='6' cy='18' r='2.5'/><circle cx='18' cy='18' r='2.5'/><path d='M6 8.5v7M18 15.5V9a3 3 0 0 0-3-3h-4M13 4l-2 2 2 2'/></svg></div><h3>Code review</h3><p>Reviews uncommitted changes, a branch or a GitHub pull request. Each finding has a file:line, a severity and a suggested fix.</p></div>
-<div class="card"><div class="icon" aria-hidden="true"><svg viewBox='0 0 24 24'><rect x='3' y='4' width='18' height='14' rx='2'/><path d='M3 8h18'/><path d='M11 11l6 2.5-2.5 1-1 2.5z'/></svg></div><h3>Browser flows</h3><p>Clicks through your local app the way a person would, and records a screenshot of every step. It can also compare before-and-after screenshots.</p></div>
-<div class="card"><div class="icon" aria-hidden="true"><svg viewBox='0 0 24 24'><path d='M12 3l9 5-9 5-9-5z'/><path d='M3 13l9 5 9-5'/></svg></div><h3>Memory per project</h3><p>Remembers commands, decisions and procedures across conversations. Each project's memory is kept separate, and Friday shows which memories informed each answer.</p></div>
-<div class="card"><div class="icon" aria-hidden="true"><svg viewBox='0 0 24 24'><ellipse cx='12' cy='5' rx='8' ry='3'/><path d='M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5'/><path d='M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3'/></svg></div><h3>Read-only databases</h3><p>Postgres, MySQL and SQLite. Queries run in read-only sessions, and passwords never reach Friday.</p></div>
-<div class="card"><div class="icon" aria-hidden="true"><svg viewBox='0 0 24 24'><circle cx='11' cy='11' r='7'/><path d='M20 20l-4-4'/></svg></div><h3>Web research</h3><p>Searches docs and changelogs, and writes research reports in which every claim cites a numbered source.</p></div>
-<div class="card"><div class="icon" aria-hidden="true"><svg viewBox='0 0 24 24'><rect x='9' y='3' width='6' height='11' rx='3'/><path d='M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8'/></svg></div><h3>Local voice</h3><p>Speaks replies with Kokoro and takes dictation with Whisper, on your CPU. The audio never leaves your machine.</p></div>
-<div class="card"><div class="icon" aria-hidden="true"><svg viewBox='0 0 24 24'><path d='M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z'/><path d='M14 3v6h6M8 13h8M8 17h5'/></svg></div><h3>Documents</h3><p>Writes reports, plans and decks as PDF, Word, Excel or PowerPoint files, straight into the project.</p></div>
-</div>
-</div></section>
+    <section id="what">
+      <h2>Works on the project in front of you</h2>
+      <p class="sub">Point Friday at a folder. It maps the code, edits with your approval, and checks the result against the project's own tests and build.</p>
+      <div class="grid">
+        <article class="card">
+          <h3>Read before it writes</h3>
+          <p>File reads, search, a code map of classes and functions, and git status or diffs run without approval. Credential files stay unreadable, and search only reports that one matched, by name.</p>
+        </article>
+        <article class="card">
+          <h3>Edits you can undo</h3>
+          <p>Changes are exact diffs, shown before they run. A re-check refuses a stale edit if the file moved. Undo and roll back a run refuse to overwrite work you made since.</p>
+        </article>
+        <article class="card">
+          <h3>Tests with a real report</h3>
+          <p>Friday runs the project's suite and reports failures with file and line, flaky tests, and the slowest tests. A verification report is built from its records, not from the model's summary.</p>
+        </article>
+        <article class="card">
+          <h3>Git, review, and pull requests</h3>
+          <p>Inspect freely. Commits, branches, pushes and pull requests need approval every time. Pushes never target the default branch and are never forced. Reviews land as a card, most severe first.</p>
+        </article>
+        <article class="card">
+          <h3>Task worktrees</h3>
+          <p>Start a task on its own branch in a separate worktree, so your checkout stays untouched. Accept merges or squashes it back, keeps the branch, or discards it.</p>
+        </article>
+        <article class="card">
+          <h3>Rename and move symbols</h3>
+          <p>Find references, rename a symbol across the project, or move a definition to another file, with the same approval and undo path as any other edit.</p>
+        </article>
+      </div>
+    </section>
 
-<section id="approvals"><div class="wrap two">
-<div>
-<h2>You stay in control</h2>
-<p class="sub">There is no "always allow". The widest grant is a task permission, which ends when the task ends.</p>
-<ol class="steps">
-<li><strong>Approve once, reject, or cancel.</strong> Each approval is tied to a hash of the exact action and the file state you reviewed.</li>
-<li><strong>Stale means it doesn't run.</strong> If a file changes before the action runs, the action is dropped and Friday has to propose it again.</li>
-<li><strong>Requests expire.</strong> An approval request that waits more than 15 minutes is never executed.</li>
-<li><strong>Verification reports.</strong> Every task ends with a report built from Friday's own records, not from what the model claims.</li>
-</ol>
-</div>
-<div>
-<h2>Command sandbox</h2>
-<p class="sub">For untrusted code, you can run a project's commands in a throwaway Docker container instead of on your machine.</p>
-<div class="card"><p>The container sees only the project folder, with credential files hidden and <code>.git</code> read-only. It has no network by default, no Docker socket and none of your environment variables. All capabilities are dropped, the root filesystem is read-only, and CPU, memory and process limits apply. The container is removed when the command ends.</p></div>
-</div>
-</div></section>
+    <section id="approvals">
+      <h2>Approval is the product</h2>
+      <p class="sub">Friday can propose a lot. It cannot apply an edit, run a command, open a shell on a server, or push a branch until you say so. Ask and Plan modes are enforced by the tool policy, not by a prompt.</p>
+      <div class="split">
+        <div>
+          <div class="modes">
+            <div class="mode"><strong>Auto</strong><span>Picks an approach. May offer a mode switch. Never switches itself.</span></div>
+            <div class="mode"><strong>Code</strong><span>Implements and verifies with tests, type-check or build.</span></div>
+            <div class="mode"><strong>Plan</strong><span>Investigates and writes a plan. Changes nothing until you accept it.</span></div>
+            <div class="mode"><strong>Debug</strong><span>Reproduces first, names the cause with evidence, then makes the smallest fix.</span></div>
+            <div class="mode"><strong>Ask</strong><span>Explains only. Editing, commands, git writes and SSH are refused.</span></div>
+          </div>
+          <div class="grid" style="margin-top:14px">
+            <article class="card">
+              <h3>Task permissions</h3>
+              <p>For a fix-and-retest loop, approve one bounded permission: named files, exact commands, a time limit and an action cap. Revoke it any time. Deletes, moves, git writes, SSH and high-risk commands are never covered.</p>
+            </article>
+            <article class="card">
+              <h3>Resume, don't restart</h3>
+              <p>Progress is checkpointed after every action. If the app stops mid-task, Resume hands back what already changed and which commands ran. Pending approvals are cancelled so they cannot run late.</p>
+            </article>
+          </div>
+        </div>
+        <aside class="panel" aria-label="Example approval">
+          <h3>Waiting on you</h3>
+          <div class="row"><span>Edit <code>src/auth.ts</code></span><b class="wait">Needs approval</b></div>
+          <div class="row"><span>Run <code>npm test</code></span><b class="ok">Passed · exit 0</b></div>
+          <div class="row"><span>Commit on <code>friday/task-…</code></span><b class="wait">Needs approval</b></div>
+          <div class="row"><span>Push <code>main</code></span><b>Refused</b></div>
+          <div class="row"><span>Verification</span><b class="ok">Verified</b></div>
+          <p class="fine" style="margin-top:12px">The card shows the diff, the exact command, and the reason. Production SSH also requires a recorded plan and you typing the host name.</p>
+        </aside>
+      </div>
+    </section>
 
-<section id="devops"><div class="wrap">
-<h2>DevOps with safeguards</h2>
-<p class="sub">Server diagnostics, logs, Docker, deployment plans and approved SSH commands, with extra checks for production.</p>
-<div class="grid">
-<div class="card"><h3>Read-only diagnostics</h3><p>Checks uptime, disk, memory, failed services, journals, listening ports, nginx -t and certificates.</p></div>
-<div class="card"><h3>Deployment plans</h3><p>Each plan lists pre-checks with backups, the exact steps, risk, downtime, rollback and verification. A production command needs a recorded plan, and you type the host name to approve it.</p></div>
-<div class="card"><h3>Strict SSH</h3><p>Friday ignores ~/.ssh/config, disables password and agent forwarding, and checks host keys strictly against the keys you trusted.</p></div>
-<div class="card"><h3>CI diagnosis</h3><p>Finds the first real error in a failed GitHub Actions run and points at the project files it names.</p></div>
-<div class="card"><h3>Compose and dependencies</h3><p>Manages only this project's containers. Recommended dependency upgrades are releases at least 14 days old, and Friday reads the release notes for breaking changes first.</p></div>
-<div class="card"><h3>Monitors and load tests</h3><p>Shows the status of your health monitors, and runs k6 load tests against local or listed targets.</p></div>
-</div>
-</div></section>
+    <section>
+      <h2>More than a chat box</h2>
+      <p class="sub">The same approval model covers the rest of a working day: previews, documents, voice, memory, and the web.</p>
+      <div class="grid">
+        <article class="card">
+          <h3>Screenshots and preview</h3>
+          <p>Paste or drop images, or let Friday look at PNG, JPEG, WebP and GIF files in the project. A live preview and recorded browser flows can exercise the UI you just changed.</p>
+        </article>
+        <article class="card">
+          <h3>Background processes</h3>
+          <p>Dev servers and watchers start with approval, then can be read and stopped without another prompt. They show in a side panel with their local URL and a Stop button.</p>
+        </article>
+        <article class="card">
+          <h3>Documents</h3>
+          <p>Ask for a PDF, Word, Excel or PowerPoint file and Friday writes it into the project. Export a conversation as Markdown or PDF, with secrets redacted.</p>
+        </article>
+        <article class="card">
+          <h3>Memory, per project</h3>
+          <p>Durable facts: architecture, commands, decisions, procedures, and preferences you approve. Each answer shows which memories were used. Project memory stays isolated.</p>
+        </article>
+        <article class="card">
+          <h3>Voice, on this machine</h3>
+          <p>Kokoro speaks replies and Whisper base takes dictation, both on the CPU. Models download only when you ask, audio is never stored, and saying "approve" never approves anything.</p>
+        </article>
+        <article class="card">
+          <h3>Web search and research</h3>
+          <p>Look up current docs, release notes and errors, or run a longer research pass that cites its sources. Page text is treated as data, not instructions.</p>
+        </article>
+        <article class="card wide">
+          <h3>Connected apps, databases, and saved actions</h3>
+          <p>MCP apps show up as extra tools under the same approval rules. Connected databases can be inspected and queried read-only. Saved actions are the procedures you keep for this project, such as a staging deploy, run as a named step instead of retyped instructions.</p>
+        </article>
+        <article class="card">
+          <h3>Token use you can see</h3>
+          <p>Tools load in groups. Usage shows where input went, what optimization saved, and prompt-cache hits. Keys are never stored in SQLite.</p>
+        </article>
+      </div>
+    </section>
 
-<section id="install"><div class="wrap two">
-<div>
-<h2>Desktop app</h2>
-<p class="note">64-bit Linux, or WSL2 with WSLg. Node.js is built in.</p>
-<pre><code>npm install
-npm run dist:desktop</code></pre>
-<p class="note">This writes an AppImage and a .deb to <code>apps/desktop/release/</code>.</p>
-<pre><code>sudo apt install ./friday_*_amd64.deb</code></pre>
-<p class="note">On first launch, open <strong>Friday &rsaquo; Show Config File</strong>, set <code>NTL_API_KEY=</code>, then restart the server from Settings.</p>
-</div>
-<div>
-<h2>Web app from source</h2>
-<p class="note">Node.js 22.13 or newer and npm, on Linux, macOS or WSL2. There are no native modules to compile.</p>
-<pre><code>npm install
-cp .env.example .env</code></pre>
-<p class="note">Set <code>NTL_API_KEY</code> in <code>.env</code>, then run one of these:</p>
-<pre><code># development: UI on http://localhost:5173
-npm run dev
+    <section id="devops">
+      <h2>DevOps, with the brakes on</h2>
+      <p class="sub">Servers are opt-in. Friday stores a key path, never a password, and will not connect until you trust the host key.</p>
+      <div class="grid">
+        <article class="card">
+          <h3>This machine first</h3>
+          <p>Environment checks, log search, config validation and health monitors run locally. Docker Compose status is read-only until you approve a control action.</p>
+        </article>
+        <article class="card">
+          <h3>CI, read-only</h3>
+          <p>Ask why a GitHub Actions run failed. Friday uses your <code>gh</code> login for GET requests only, finds the first real error, and maps runner paths back to project files.</p>
+        </article>
+        <article class="card">
+          <h3>SSH with a plan</h3>
+          <p>Read-only diagnostics, a deployment plan, then an approved remote command. Production needs the plan first, a five-minute approval, and the host name typed by you.</p>
+        </article>
+        <article class="card">
+          <h3>Dependencies</h3>
+          <p>See what is outdated or vulnerable, read the release notes, and upgrade only through an approved change.</p>
+        </article>
+        <article class="card">
+          <h3>Load tests</h3>
+          <p>Run k6 against this machine or hosts you have listed. It does not get a blank cheque to hit somewhere else.</p>
+        </article>
+        <article class="card">
+          <h3>Databases, read-only</h3>
+          <p>Schema and approved SELECT-style queries on databases you connected. Writes are not a tool.</p>
+        </article>
+      </div>
+    </section>
 
-# production-style: http://127.0.0.1:4317
-npm run build
-npm start</code></pre>
-</div>
-</div></section>
+    <section id="install">
+      <h2>Install</h2>
+      <p class="sub">The desktop app is a Linux AppImage or deb, with Node built in. From source it also runs as a local web app on Linux, macOS or WSL2.</p>
+      <div class="split">
+        <ol class="steps">
+          <li><b>Desktop.</b> 64-bit Linux, or WSL2 with WSLg. Grab the AppImage or deb from <a href="https://github.com/mrunknown0001/friday/releases">Releases</a>. Nothing else to install.</li>
+          <li><b>From source.</b> Node.js 22.13 or newer (tested on 22.23) and npm. Clone the repo, install, and run <code>npm run dev</code> or <code>npm start</code>.</li>
+          <li><b>Add one provider key</b> in the env file Settings points at: <code>NTL_API_KEY</code>, <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, <code>OPENROUTER_API_KEY</code>, <code>GEMINI_API_KEY</code> or <code>SEVENAPI_API_KEY</code>.</li>
+          <li><b>Open a project</b> and send a message. The server binds to <code>127.0.0.1</code>. Data lives in <code>~/.config/Friday/data</code> for the desktop app, or <code>./.data</code> for the web app.</li>
+        </ol>
+        <div class="panel">
+          <h3>Useful scripts</h3>
+          <div class="row"><code>npm run dev</code><span>API + Vite</span></div>
+          <div class="row"><code>npm test</code><span>No API key</span></div>
+          <div class="row"><code>npm run desktop</code><span>App from checkout</span></div>
+          <div class="row"><code>npm run dist:desktop</code><span>AppImage and deb</span></div>
+          <div class="row"><code>npm run typecheck</code><span>Strict TypeScript</span></div>
+          <p class="fine" style="margin-top:12px">Live integration tests are separate and use quota. See the README for the full configuration table.</p>
+        </div>
+      </div>
+    </section>
 
-<section id="first-run"><div class="wrap">
-<h2>First run</h2>
-<ol class="steps">
-<li><strong>Open Settings.</strong> It shows whether <code>NTL_API_KEY</code> is configured.</li>
-<li><strong>Pick a model</strong> and click <em>Use selected model</em>.</li>
-<li><strong>Test connection.</strong> This sends one tiny completion, the only check that confirms both your key and your plan's access to the model.</li>
-<li><strong>Add a project</strong> by its absolute path. Friday can read inside that folder only. Broad locations such as / or your home folder are refused.</li>
-</ol>
-</div></section>
+    <section>
+      <h2>Providers</h2>
+      <p class="sub">Switching provider is choosing another model. Capabilities, context window and usage prices are kept per model id.</p>
+      <table>
+        <thead>
+          <tr><th>Provider</th><th>Key</th><th>Model id</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>NoTokenLimit</td><td><code>NTL_API_KEY</code></td><td>as listed, e.g. <code>claude-sonnet-4.6</code></td></tr>
+          <tr><td>Anthropic</td><td><code>ANTHROPIC_API_KEY</code></td><td><code>anthropic:claude-sonnet-4-6</code></td></tr>
+          <tr><td>OpenAI</td><td><code>OPENAI_API_KEY</code></td><td><code>openai:gpt-5</code></td></tr>
+          <tr><td>OpenRouter</td><td><code>OPENROUTER_API_KEY</code></td><td><code>openrouter:anthropic/claude-sonnet-4.6</code></td></tr>
+          <tr><td>Google Gemini</td><td><code>GEMINI_API_KEY</code></td><td><code>gemini:gemini-2.5-pro</code></td></tr>
+          <tr><td>7API</td><td><code>SEVENAPI_API_KEY</code></td><td><code>7api:…</code></td></tr>
+        </tbody>
+      </table>
+      <p class="fine" style="margin-top:12px">Each provider address can point at a proxy or a compatible gateway. Timeout and retries apply to all of them. For multi-step work the project recommends <code>claude-sonnet-4.6</code> or stronger, and probing a new model before relying on its tool use.</p>
+    </section>
 
-<section id="security"><div class="wrap">
-<h2>How it is put together</h2>
-<p class="sub">The desktop window is a sandboxed Chromium page with no Node.js access. It talks to a local server on a random loopback port, and every request carries a secret generated at launch, so other programs on the machine cannot drive the agent.</p>
-<div class="tablewrap"><table>
-<tr><th>What</th><th>Where</th></tr>
-<tr><td>Config (API key, model)</td><td><code>~/.config/Friday/friday.env</code></td></tr>
-<tr><td>Data (conversations, memory)</td><td><code>~/.config/Friday/data/</code></td></tr>
-<tr><td>Server log</td><td><code>~/.config/Friday/logs/server.log</code></td></tr>
-</table></div>
-<p class="note" style="margin-top:18px">API keys are never stored in the database, sent to the browser or logged. Friday never reads credential files (<code>.env</code>, private keys, <code>.ssh/</code>, <code>.aws/</code>), even inside a project.</p>
-</div></section>
+    <section>
+      <h2>What stays on your machine</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>Local data</h3>
+          <p>SQLite holds conversations, checkpoints, approvals, undo backups, memories and an audit log. The data folder is created <code>0700</code> and the database <code>0600</code>.</p>
+        </article>
+        <article class="card">
+          <h3>Keys stay in the env file</h3>
+          <p>API keys are read from config and are never stored in the database. SSH records keep the key path only. Friday does not read your git or <code>gh</code> credentials.</p>
+        </article>
+        <article class="card">
+          <h3>Localhost only</h3>
+          <p>The server binds to <code>127.0.0.1</code>. A lock file stops two servers from sharing one database. Quit, copy the data folder, and you have a backup.</p>
+        </article>
+      </div>
+    </section>
+  </div>
 </main>
 
-<footer><div class="wrap">Friday &middot; a local-first AI coding and DevOps assistant &middot; models by <a href="https://notokenlimit.com">NoTokenLimit</a> &middot; <a href="https://github.com/mrunknown0001/friday" target="_blank" rel="noopener noreferrer">Source on GitHub</a></div></footer>
-
-<script>
-document.querySelectorAll('pre').forEach(function(pre){
-  var b=document.createElement('button');b.className='copy';b.textContent='Copy';
-  b.addEventListener('click',function(){
-    var t=pre.querySelector('code').innerText.split('\n').filter(function(l){return l.trim()&&l.trim()[0]!=='#'}).join('\n');
-    navigator.clipboard.writeText(t).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1500)});
-  });
-  pre.appendChild(b);
-});
-</script>
+<footer>
+  <div class="wrap" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;width:100%">
+    <span>Friday · local-first coding and DevOps assistant</span>
+    <span>
+      <a href="https://github.com/mrunknown0001/friday">Source</a>
+      · <a href="https://github.com/mrunknown0001/friday/blob/main/README.md">README</a>
+      · <a href="https://github.com/mrunknown0001/friday/blob/main/docs/ROADMAP.md">Roadmap</a>
+    </span>
+  </div>
+</footer>
 </body>
 </html>
